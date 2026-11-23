@@ -1,0 +1,5 @@
+﻿Commit upstream : 8d79e6b2f7fad6375340afcb51c85ed370c64a14
+Go              : go version go1.27.4 windows/amd64
+SHA-256         : b443c9a997067d66b9f32ca4729373156a58bd6b8d2e007a56df9f4d2305604a
+Tamanho         : 29130992 bytes
+Gerado em       : 2026-11-23 18:48:49 -03:00

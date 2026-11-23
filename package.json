@@ -1,0 +1,11 @@
+{
+  "name": "danfse-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Gera o DANFSe em PDF a partir do XML da NFS-e, no navegador.",
+  "scripts": {
+    "test": "node --test tests/",
+    "start": "python -m http.server 8020 --bind 127.0.0.1"
+  }
+}

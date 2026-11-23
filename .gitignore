@@ -1,0 +1,11 @@
+*.log
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# artefatos de build/teste locais
+/tests/tmp/
+/build/
+/node_modules/
+.venv/
+amostras/

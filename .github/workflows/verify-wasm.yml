@@ -1,0 +1,57 @@
+name: Verificar WASM
+
+# Confere se wasm/danfse.wasm continua sendo o binário do gerador oficial no
+# commit fixo, e se o site referencia um arquivo que existe. Não faz deploy:
+# o GitHub Pages publica direto da raiz de main.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wasm:
+    runs-on: ubuntu-latest
+    env:
+      COMMIT: 8d79e6b2f7fad6375340afcb51c85ed370c64a14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: O binário versionado existe?
+        run: test -s wasm/danfse.wasm && test -s wasm/wasm_exec.js
+
+      - name: O wasm tem assinatura de módulo WebAssembly?
+        run: test "$(head -c 4 wasm/danfse.wasm)" = "$(printf '\0asm')"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.27.4"
+
+      - name: Baixar o gerador no commit fixo
+        run: |
+          curl -fsSL -o upstream.zip "https://codeload.github.com/ReceitaFederal/calculadora-rtc-gerador-danfse/zip/${COMMIT}"
+          unzip -q upstream.zip
+          echo "SRC=${{ github.workspace }}/calculadora-rtc-gerador-danfse-${COMMIT}" >> "$GITHUB_ENV"
+
+      - name: Compilar o mesmo commit
+        run: |
+          cd "$SRC"
+          GOOS=js GOARCH=wasm CGO_ENABLED=0 GOFLAGS=-buildvcs=false \
+            go build -trimpath -ldflags="-s -w" -o "$GITHUB_WORKSPACE/build-danfse.wasm" ./cmd/danfse-wasm
+
+      - name: O binário recompilado é idêntico ao versionado
+        run: cmp build-danfse.wasm wasm/danfse.wasm
+
+      - name: Registrar SHA-256 na verificação
+        run: |
+          echo "## Verificação do WASM" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Binário idêntico ao recompilado de \`$COMMIT\`." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"
+          sha256sum wasm/danfse.wasm >> "$GITHUB_STEP_SUMMARY"
+          echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"

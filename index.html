@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1f3a">
+<meta name="description" content="Gere o DANFSe em PDF a partir do XML da NFS-e, direto no navegador. Sem servidor, sem certificado e sem enviar dados fiscais para fora.">
+<title>DANFSe Web — XML para PDF no navegador</title>
+<link rel="preload" href="assets/fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" href="assets/favicon.svg">
+</head>
+<body>
+<a class="pular" href="#conteudo">Ir para o conteúdo</a>
+
+<header class="topo">
+  <div class="wrap barra">
+    <div class="marca">
+      <img src="assets/logo.svg" alt="DANFSe Web" class="logo-img" width="140" height="35">
+      <span class="nome">DANFSe Web <small>XML → PDF no navegador</small></span>
+    </div>
+    <span class="espaco"></span>
+    <span class="status" aria-live="polite">
+      <span class="ponto" id="ponto" aria-hidden="true"></span>
+      <span id="estadoMotor">carregando motor…</span>
+    </span>
+  </div>
+</header>
+
+<section class="hero" aria-labelledby="tituloSite">
+  <div class="wrap hero-inner">
+    <p class="eyebrow">100% local · sem certificado</p>
+    <h1 id="tituloSite">DANFSe a partir do XML</h1>
+    <p class="hero-sub">
+      Arraste os XMLs de NFS-e e receba o DANFSe em PDF — gerado no seu navegador pelo
+      mesmo componente oficial da Receita, sem enviar nada para a internet.
+    </p>
+  </div>
+</section>
+
+<main class="wrap conteudo" id="conteudo">
+  <p class="dica" id="avisoProtocolo" role="alert" hidden>
+    <b>Abra pelo servidor local.</b> O navegador bloqueia o motor WASM em <code>file://</code>.
+    Use o <code>iniciar-site.bat</code> ou rode <code>python -m http.server 8020</code> na pasta do site.
+  </p>
+
+  <div class="grade-2">
+    <section class="card" aria-labelledby="tituloArquivos">
+      <h2 id="tituloArquivos"><span class="n" aria-hidden="true">1</span>Arquivos</h2>
+      <p class="sub">Aceita vários XMLs. Cada um vira um PDF; o lote inteiro pode ir num ZIP.</p>
+
+      <div class="drop" id="drop" tabindex="0" role="button" aria-describedby="dropAjuda">
+        <svg class="drop-icone" viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M12 6h16l10 10v26H12z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M28 6v10h10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M24 34V21m0 0-6 6m6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <strong id="dropTitulo">Arraste os XMLs aqui</strong>
+        <span class="drop-ou">ou</span>
+        <button class="btn" id="btnEscolher" type="button">Escolher XMLs</button>
+        <input type="file" id="entradaArquivos" accept=".xml,text/xml,application/xml" multiple hidden>
+        <p class="ajuda" id="dropAjuda">Até 5 MiB por arquivo. O XML é lido só na memória desta aba.</p>
+      </div>
+
+      <div class="lista-topo" id="listaTopo" hidden>
+        <span id="resumoLista">0 arquivos</span>
+        <button class="link" id="btnLimpar" type="button">Limpar tudo</button>
+      </div>
+      <ul class="arquivos" id="lista"></ul>
+      <p class="vazio" id="listaVazia">Nenhum arquivo ainda.</p>
+    </section>
+
+    <section class="card" aria-labelledby="tituloOpcoes">
+      <h2 id="tituloOpcoes"><span class="n" aria-hidden="true">2</span>Gerar</h2>
+      <p class="sub">As opções valem para todos os arquivos do lote.</p>
+
+      <div class="campo">
+        <label for="situacao">Situação da nota</label>
+        <select id="situacao" name="situacao">
+          <option value="0">Válida</option>
+          <option value="1">Substituída</option>
+          <option value="2">Cancelada</option>
+        </select>
+        <p class="ajuda">Define a marcação do DANFSe (stc 0, 1 ou 2).</p>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" id="canhoto" checked>
+        <span>Incluir canhoto</span>
+      </label>
+      <p class="ajuda">O canhoto é a faixa de recibo no rodapé do PDF.</p>
+
+      <div class="acoes">
+        <button class="btn" id="btnGerar" type="button" disabled>Gerar DANFSe(s)</button>
+        <button class="btn ghost" id="btnCancelar" type="button" hidden>Cancelar</button>
+      </div>
+
+      <div class="progresso-box" id="progressoBox" hidden>
+        <div class="progresso-topo">
+          <span id="progressoTexto">Preparando…</span>
+          <span id="progressoNumero" class="mono"></span>
+        </div>
+        <progress id="progresso" max="1" value="0"></progress>
+      </div>
+
+      <div class="resumo" id="resumo" hidden>
+        <dl>
+          <div><dt>Prontos</dt><dd id="resumoProntos">0</dd></div>
+          <div><dt>Erros</dt><dd id="resumoErros">0</dd></div>
+          <div><dt>Recusados</dt><dd id="resumoRecusados">0</dd></div>
+        </dl>
+        <button class="btn" id="btnZip" type="button" disabled>Baixar ZIP</button>
+      </div>
+
+      <p class="alerta" id="erroMotor" role="alert" hidden></p>
+    </section>
+  </div>
+
+  <p class="rodape-privacidade">
+    <b>Privacidade:</b> nenhum XML é enviado para servidores. Depois que a página carrega,
+    o site funciona até offline. Fechar a aba apaga tudo.
+  </p>
+</main>
+
+<div class="toasts" id="toasts" aria-live="assertive"></div>
+
+<footer class="rodape">
+  <div class="wrap">
+    Gerador oficial: <a href="https://github.com/ReceitaFederal/calculadora-rtc-gerador-danfse" rel="noopener" target="_blank">calculadora-rtc-gerador-danfse</a>
+    (MIT) compilado para WebAssembly. Este site não tem vínculo com o governo.
+  </div>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
