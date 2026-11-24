@@ -73,7 +73,7 @@ publicar o repositório.
 
 ```
 index.html          página única
-style.css           visual (mesmo tema do nfse-web: claro/escuro automático)
+style.css           visual (mesmo tema do site Alíquota Simples)
 app.js              estado, fila de geração, eventos, ZIP
 js/wasm.js          carrega o motor e fala com a Web Worker
 js/worker.js        executa o motor fora da linha de execução da interface

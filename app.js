@@ -97,7 +97,6 @@ async function adicionarArquivos(arquivos) {
       erro: null,
       detalhe: null,
       pdf: null,
-      url: null,
       nomePdf: null,
       tamanhoPdf: 0,
     });
@@ -123,8 +122,6 @@ function traduzirErro(erro) {
 }
 
 function liberar(item) {
-  if (item.url) URL.revokeObjectURL(item.url);
-  item.url = null;
   item.pdf = null;
 }
 
@@ -161,7 +158,6 @@ async function gerarLote(itens) {
         item.pdf = pdf;
         item.tamanhoPdf = pdf.size;
         item.nomePdf = nomePdf(item.nome);
-        item.url = URL.createObjectURL(pdf);
         item.status = "pronto";
       } catch (erro) {
         item.status = "erro";
@@ -268,7 +264,6 @@ function linha(item) {
 
   if (item.status === "pronto") {
     acoes.append(
-      botaoAcao("Ver PDF", "ver", "ghost"),
       botaoAcao("Baixar", "baixar"),
       botaoAcao("Remover", "remover", "ghost"),
     );
@@ -438,9 +433,7 @@ lista.addEventListener("click", (evento) => {
   const item = estado.itens.find((candidato) => candidato.id === Number(id));
   if (!item) return;
 
-  if (botao.dataset.acao === "ver") {
-    if (item.url) window.open(item.url, "_blank", "noopener");
-  } else if (botao.dataset.acao === "baixar") {
+  if (botao.dataset.acao === "baixar") {
     if (item.pdf) baixarBlob(item.pdf, item.nomePdf);
   } else if (botao.dataset.acao === "remover") {
     remover(id);
