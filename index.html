@@ -76,25 +76,31 @@
       <h2 id="tituloOpcoes"><span class="n" aria-hidden="true">2</span>Gerar</h2>
       <p class="sub">As opções valem para todos os arquivos do lote.</p>
 
-      <div class="campo">
-        <label for="situacao">Situação da nota</label>
-        <select id="situacao" name="situacao">
-          <option value="0">Válida</option>
-          <option value="1">Substituída</option>
-          <option value="2">Cancelada</option>
-        </select>
-        <p class="ajuda">Define a marcação do DANFSe (stc 0, 1 ou 2).</p>
-      </div>
+      <div class="opcoes">
+        <div class="campo">
+          <label for="situacao">Situação da nota</label>
+          <select id="situacao" name="situacao">
+            <option value="0">Válida</option>
+            <option value="1">Substituída</option>
+            <option value="2">Cancelada</option>
+          </select>
+          <p class="ajuda">Define a marcação do DANFSe (stc 0, 1 ou 2).</p>
+        </div>
 
-      <label class="check">
-        <input type="checkbox" id="canhoto" checked>
-        <span>Incluir canhoto</span>
-      </label>
-      <p class="ajuda">O canhoto é a faixa de recibo no rodapé do PDF.</p>
+        <div class="opcao-lado">
+          <label class="check">
+            <input type="checkbox" id="canhoto" checked>
+            <span>Incluir canhoto</span>
+          </label>
+          <p class="ajuda">O canhoto é a faixa de recibo no rodapé do PDF.</p>
+        </div>
 
-      <div class="acoes">
-        <button class="btn" id="btnGerar" type="button" disabled>Gerar DANFSe(s)</button>
-        <button class="btn ghost" id="btnCancelar" type="button" hidden>Cancelar</button>
+        <div class="opcao-lado">
+          <div class="acoes">
+            <button class="btn" id="btnGerar" type="button" disabled>Gerar DANFSe(s)</button>
+            <button class="btn ghost" id="btnCancelar" type="button" hidden>Cancelar</button>
+          </div>
+        </div>
       </div>
 
       <div class="progresso-box" id="progressoBox" hidden>
