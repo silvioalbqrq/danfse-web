@@ -2,26 +2,37 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { nomePdf, nomeZip, formatarBytes } from "../js/nomes.js";
-import { decodificarXml, LIMITE_XML, validarArquivo } from "../js/entrada.js";
+import { decodificarXml, chaveAcesso, LIMITE_XML, validarArquivo } from "../js/entrada.js";
 
-const CHAVE = "35503082212345678000199000000000012345678901234567";
-
-test("nomePdf usa a chave de acesso do Id NFS", () => {
-  const xml = `<NFSe><infNFSe Id="NFS${CHAVE}"><xNome>Teste</xNome></infNFSe></NFSe>`;
-  assert.equal(nomePdf(xml, "nota.xml"), `DANFSe-${CHAVE}.pdf`);
+test("chaveAcesso lê o Id NFS de 50 dígitos", () => {
+  const chave = "35503082212345678000199000000000012345678901234567";
+  assert.equal(chaveAcesso(`<infNFSe Id="NFS${chave}">`), chave);
 });
 
-test("nomePdf aceita Id entre aspas simples e espaços", () => {
-  const xml = `<infNFSe Id = 'NFS${CHAVE}'>`;
-  assert.equal(nomePdf(xml, "nota.xml"), `DANFSe-${CHAVE}.pdf`);
+test("chaveAcesso aceita espaços e aspas simples", () => {
+  const chave = "35503082212345678000199000000000012345678901234567";
+  assert.equal(chaveAcesso(`<infNFSe Id = 'NFS${chave}'>`), chave);
 });
 
-test("nomePdf cai para o nome do arquivo sem Id", () => {
-  assert.equal(nomePdf("<NFSe/>", "minha nota.xml"), "DANFSe-minha-nota.pdf");
+test("chaveAcesso devolve null sem Id NFS", () => {
+  assert.equal(chaveAcesso("<NFSe/>"), null);
+  assert.equal(chaveAcesso(""), null);
+});
+
+test("nomePdf usa o nome do arquivo XML", () => {
+  assert.equal(nomePdf("nota.xml"), "nota.pdf");
+});
+
+test("nomePdf aceita a extensão em maiúsculas", () => {
+  assert.equal(nomePdf("NOTA.XML"), "NOTA.pdf");
+});
+
+test("nomePdf remove o caminho do arquivo", () => {
+  assert.equal(nomePdf("C:\\pasta\\nota.xml"), "nota.pdf");
 });
 
 test("nomePdf nunca devolve nome vazio", () => {
-  assert.equal(nomePdf("<NFSe/>", ".xml"), "DANFSe-documento.pdf");
+  assert.equal(nomePdf(".xml"), "documento.pdf");
 });
 
 test("nomeZip usa data e hora locais", () => {

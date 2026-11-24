@@ -4,7 +4,14 @@ import { formatarBytes } from "./nomes.js";
 
 export const LIMITE_XML = 5 * 1024 * 1024; // mesmo limite do gerador oficial
 
+const CHAVE_NFS = /Id\s*=\s*["']NFS(\d{50})["']/;
+
 const CODIFICACOES_LATINAS = new Set(["iso88591", "latin1", "windows1252", "cp1252", "latin9", "iso885915"]);
+
+export function chaveAcesso(xml) {
+  const achado = CHAVE_NFS.exec(String(xml || ""));
+  return achado ? achado[1] : null;
+}
 
 export function validarArquivo(nome, tamanho) {
   if (!/\.xml$/i.test(String(nome || ""))) return "Selecione um arquivo .xml.";

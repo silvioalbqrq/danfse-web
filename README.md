@@ -28,8 +28,8 @@ Requisitos: Python 3 instalado (é o que serve os arquivos) e um navegador atual
 4. Clique em **Gerar DANFSe**.
 
 Cada arquivo ganha os botões **Ver** e **Baixar**, e o lote inteiro um **Baixar ZIP**.
-O ZIP sai como `danfse-AAAAMMDD-HHMM.zip`, com um PDF por XML, nomeado pela chave de
-acesso da nota (`DANFSe-<chave>.pdf`).
+O ZIP sai como `danfse-AAAAMMDD-HHMM.zip`, com um PDF por XML, nomeado pelo
+arquivo XML (`<nome>.pdf`).
 
 Se você mexer em situação ou canhoto depois de gerar, os PDFs daquela sessão ficam
 marcados como **desatualizados** e podem ser gerados de novo.
@@ -38,7 +38,8 @@ marcados como **desatualizados** e podem ser gerados de novo.
 
 - 100 arquivos por lote.
 - 5 MiB por arquivo.
-- Apenas XMLs. Arquivos de mesmo nome e tamanho entram uma vez só.
+- Apenas XMLs. Arquivos de mesmo nome e tamanho, ou com a mesma chave de acesso,
+  entram uma vez só.
 - O XML pode estar em UTF-8 ou ISO-8859-1/windows-1252 (declarada no XML); o
   site converte para UTF-8 antes de gerar. Em outra codificação, converta o
   arquivo antes de enviar.
@@ -48,6 +49,9 @@ marcados como **desatualizados** e podem ser gerados de novo.
 Quando um XML é recusado, o motivo aparece em português (por exemplo, “O XML não
 está no padrão de NFS-e”) e há um detalhe técnico recolhível com a mensagem bruta
 do motor oficial. Cada linha pode ser tentada de novo sem recarregar a página.
+
+XMLs com a mesma chave de acesso (mesmo prestador, série e número) são marcados
+como repetidos e não geram PDF.
 
 ## O motor
 
@@ -75,7 +79,7 @@ js/wasm.js          carrega o motor e fala com a Web Worker
 js/worker.js        executa o motor fora da linha de execução da interface
 js/danfse.js        ponte com o gerador oficial (gerarPdf)
 js/entrada.js       leitura e normalização dos XMLs
-js/nomes.js         nome do PDF pela chave de acesso; desduplicação
+js/nomes.js         nome do PDF pelo nome do XML; desduplicação
 js/zip.js           escritor ZIP sem dependências (CRC32 próprio)
 js/ui.js            utilidades de tela (toast, aria-live)
 wasm/               binário oficial + wasm_exec.js + BUILD.txt

@@ -1,25 +1,10 @@
 // Nomes de arquivos e formatação de tamanho.
 
-const CHAVE_NFS = /Id\s*=\s*["']NFS(\d{50})["']/;
-
-function limpar(texto) {
-  const limpo = String(texto)
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^A-Za-z0-9._-]+/g, "-")
-    .replace(/-{2,}/g, "-")
-    .replace(/^[-._]+|[-._]+$/g, "")
-    .slice(0, 120);
-  return limpo || "documento";
-}
-
-export function nomePdf(xml, nomeArquivo) {
-  const achado = CHAVE_NFS.exec(String(xml || ""));
-  if (achado) return `DANFSe-${achado[1]}.pdf`;
+export function nomePdf(nomeArquivo) {
   const base = String(nomeArquivo || "")
     .replace(/^.*[\\/]/, "")
     .replace(/\.xml$/i, "");
-  return `DANFSe-${limpar(base)}.pdf`;
+  return `${base || "documento"}.pdf`;
 }
 
 export function nomeZip(data = new Date()) {

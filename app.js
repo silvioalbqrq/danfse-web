@@ -1,7 +1,7 @@
 import { carregarMotor } from "./js/wasm.js";
 import { gerarPdf } from "./js/danfse.js";
 import { criarZip, desduplicarNomes } from "./js/zip.js";
-import { decodificarXml, validarArquivo } from "./js/entrada.js";
+import { decodificarXml, validarArquivo, chaveAcesso } from "./js/entrada.js";
 import { nomePdf, nomeZip, formatarBytes } from "./js/nomes.js";
 import { $, toast, baixarBlob, definirStatusMotor } from "./js/ui.js";
 
@@ -31,9 +31,10 @@ function abrirSeletor() {
   entrada.click();
 }
 
-function adicionarArquivos(arquivos) {
+async function adicionarArquivos(arquivos) {
   let recusados = 0;
   let ignorados = 0;
+  let duplicados = 0;
 
   for (const arquivo of arquivos) {
     const aceitos = estado.itens.filter((item) => item.status !== "recusado").length;
@@ -64,11 +65,34 @@ function adicionarArquivos(arquivos) {
       continue;
     }
 
+    let chave = null;
+    try {
+      const bytes = new Uint8Array(await arquivo.arrayBuffer());
+      chave = chaveAcesso(decodificarXml(bytes));
+    } catch {
+      // segue sem chave; a geração mostra o erro de leitura
+    }
+    const existente = chave && estado.itens.find((item) => item.chave === chave);
+    if (existente) {
+      estado.itens.push({
+        id: estado.proximoId++,
+        nome: arquivo.name,
+        tamanho: arquivo.size,
+        arquivo: null,
+        status: "recusado",
+        erro: `Nota repetida: mesma chave de acesso de "${existente.nome}".`,
+        detalhe: `Chave de acesso: ${chave}`,
+      });
+      duplicados += 1;
+      continue;
+    }
+
     estado.itens.push({
       id: estado.proximoId++,
       nome: arquivo.name,
       tamanho: arquivo.size,
       arquivo,
+      chave,
       status: "pendente",
       erro: null,
       detalhe: null,
@@ -82,6 +106,7 @@ function adicionarArquivos(arquivos) {
   render();
   if (recusados) toast(`${recusados} arquivo(s) recusado(s). Veja o motivo na lista.`, "erro");
   if (ignorados) toast(`${ignorados} duplicado(s) ignorado(s).`);
+  if (duplicados) toast(`${duplicados} nota(s) repetida(s) ignorada(s): mesma chave de acesso.`, "erro");
 }
 
 /* ---------- geração ---------- */
@@ -135,7 +160,7 @@ async function gerarLote(itens) {
         liberar(item);
         item.pdf = pdf;
         item.tamanhoPdf = pdf.size;
-        item.nomePdf = nomePdf(xml, item.nome);
+        item.nomePdf = nomePdf(item.nome);
         item.url = URL.createObjectURL(pdf);
         item.status = "pronto";
       } catch (erro) {
