@@ -21,6 +21,8 @@
     U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
+[hidden] { display: none !important; }
+
 :root {
   color-scheme: light;
   --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;

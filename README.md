@@ -39,8 +39,9 @@ marcados como **desatualizados** e podem ser gerados de novo.
 - 100 arquivos por lote.
 - 5 MiB por arquivo.
 - Apenas XMLs. Arquivos de mesmo nome e tamanho entram uma vez só.
-- O XML precisa estar em UTF-8 ou ISO-8859-1/windows-1252 (o site converte). Em
-  qualquer outra codificação, a mensagem pede o arquivo convertido.
+- O XML pode estar em UTF-8 ou ISO-8859-1/windows-1252 (declarada no XML); o
+  site converte para UTF-8 antes de gerar. Em outra codificação, converta o
+  arquivo antes de enviar.
 
 ## Erros
 
@@ -58,7 +59,8 @@ do motor oficial. Cada linha pode ser tentada de novo sem recarregar a página.
 byte a byte.
 
 O workflow `.github/workflows/verify-wasm.yml` recompila esse commit a cada push para
-`main` e falha se o hash mudar, garantindo que o binário publicado é o oficial.
+`main`, roda os testes do site e falha se o hash mudar, garantindo que o binário
+publicado é o oficial.
 
 O site funciona sem essa verificação; ela é só uma garantia para quem for clonar ou
 publicar o repositório.
@@ -70,6 +72,7 @@ index.html          página única
 style.css           visual (mesmo tema do nfse-web: claro/escuro automático)
 app.js              estado, fila de geração, eventos, ZIP
 js/wasm.js          carrega o motor e fala com a Web Worker
+js/worker.js        executa o motor fora da linha de execução da interface
 js/danfse.js        ponte com o gerador oficial (gerarPdf)
 js/entrada.js       leitura e normalização dos XMLs
 js/nomes.js         nome do PDF pela chave de acesso; desduplicação
@@ -77,24 +80,24 @@ js/zip.js           escritor ZIP sem dependências (CRC32 próprio)
 js/ui.js            utilidades de tela (toast, aria-live)
 wasm/               binário oficial + wasm_exec.js + BUILD.txt
 assets/             logo, favicon, fonte Plus Jakarta Sans local
-tests/              testes (node --test tests/)
-scripts/            build do WASM e publicação no GitHub
-amostras/           XML fictício e um real anonimizado para testar
+tests/              testes (node --test tests/*.test.js)
+scripts/            build do WASM
 ```
 
 ## Testes
 
 ```
-node --test tests/
+node --test tests/*.test.js
 ```
 
-Cobrem o ZIP (cabeçalhos, CRC32, assinatura) e a escolha/desduplicação de nomes de PDF.
+Cobrem o ZIP (cabeçalhos, CRC32, assinatura), a escolha/desduplicação de nomes
+de PDF e a leitura/codificação dos XMLs.
 
 ## GitHub Pages
 
-O site é estático e funciona no GitHub Pages sem etapa de build:
-`.github/workflows/pages.yml` publica a raiz da branch `main`. Configure
-**Settings → Pages → Source: GitHub Actions** uma única vez no repositório.
+O site é estático e funciona no GitHub Pages sem etapa de build. Configure
+**Settings → Pages → Source: Deploy from a branch → main / (root)** uma única vez
+no repositório.
 
 ## Licença
 

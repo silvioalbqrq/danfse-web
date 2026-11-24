@@ -26,20 +26,20 @@ function Baixar($url, $arquivo) {
   Invoke-WebRequest -Uri $url -OutFile $arquivo
 }
 
-# --- Go portátil (não mexe no PATH do sistema) ---
-$goExe = (Get-Command go -ErrorAction SilentlyContinue).Source
-if (-not $goExe) {
-  $zipGo = Join-Path $cache "go$GoVersion.windows-amd64.zip"
-  Baixar "https://go.dev/dl/go$GoVersion.windows-amd64.zip" $zipGo
-  $pastaGo = Join-Path $cache "go$GoVersion"
-  if (-not (Test-Path $pastaGo)) {
-    Write-Host "Extraindo Go $GoVersion…"
-    Expand-Archive -Path $zipGo -DestinationPath $pastaGo -Force
-  }
-  $goExe = Join-Path $pastaGo "go\bin\go.exe"
+# --- Go fixado (ignora o Go do PATH para o build ser reproduzível) ---
+$zipGo = Join-Path $cache "go$GoVersion.windows-amd64.zip"
+Baixar "https://go.dev/dl/go$GoVersion.windows-amd64.zip" $zipGo
+$pastaGo = Join-Path $cache "go$GoVersion"
+if (-not (Test-Path $pastaGo)) {
+  Write-Host "Extraindo Go $GoVersion…"
+  Expand-Archive -Path $zipGo -DestinationPath $pastaGo -Force
 }
+$goExe = Join-Path $pastaGo "go\bin\go.exe"
 if (-not (Test-Path $goExe)) { throw "Go não encontrado em $goExe" }
 $versaoInstalada = (& $goExe version).Trim()
+if ($versaoInstalada -notmatch [regex]::Escape("go$GoVersion")) {
+  throw "Go $GoVersion esperado, mas foi encontrado: $versaoInstalada"
+}
 Write-Host "Usando $versaoInstalada"
 
 # --- código-fonte do gerador no commit fixo ---

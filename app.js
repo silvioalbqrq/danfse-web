@@ -36,7 +36,8 @@ function adicionarArquivos(arquivos) {
   let ignorados = 0;
 
   for (const arquivo of arquivos) {
-    if (estado.itens.length >= MAX_ARQUIVOS) {
+    const aceitos = estado.itens.filter((item) => item.status !== "recusado").length;
+    if (aceitos >= MAX_ARQUIVOS) {
       toast(`Limite de ${MAX_ARQUIVOS} arquivos por lote.`, "erro");
       break;
     }
@@ -102,10 +103,10 @@ function liberar(item) {
   item.pdf = null;
 }
 
-async function gerarLote() {
+async function gerarLote(itens) {
   if (estado.processando || estado.motor !== "pronto") return;
 
-  const fila = estado.itens.filter((item) => item.status === "pendente" || item.status === "erro");
+  const fila = itens || estado.itens.filter((item) => item.status === "pendente" || item.status === "erro");
   if (!fila.length) {
     toast("Nenhum arquivo pendente para gerar.");
     return;
@@ -274,6 +275,12 @@ function linha(item) {
 }
 
 function render() {
+  const ativo = document.activeElement;
+  const linhaAtiva = ativo?.closest?.(".arquivo");
+  const foco = linhaAtiva && ativo.dataset.acao
+    ? { id: linhaAtiva.dataset.id, acao: ativo.dataset.acao }
+    : null;
+
   const itens = estado.itens;
   const prontos = itens.filter((item) => item.status === "pronto");
   const erros = itens.filter((item) => item.status === "erro");
@@ -284,6 +291,9 @@ function render() {
   $("listaVazia").hidden = itens.length > 0;
   $("resumoLista").textContent = `${itens.length} arquivo${itens.length === 1 ? "" : "s"}`;
   lista.replaceChildren(...itens.map(linha));
+  if (foco) {
+    lista.querySelector(`.arquivo[data-id="${foco.id}"] button[data-acao="${foco.acao}"]`)?.focus();
+  }
 
   $("btnGerar").disabled = estado.motor !== "pronto" || estado.processando || pendentes.length === 0;
   $("btnGerar").textContent = estado.processando ? "Gerando…" : "Gerar DANFSe(s)";
@@ -410,11 +420,11 @@ lista.addEventListener("click", (evento) => {
   } else if (botao.dataset.acao === "remover") {
     remover(id);
   } else if (botao.dataset.acao === "gerar") {
-    gerarLote();
+    gerarLote([item]);
   }
 });
 
-$("btnGerar").addEventListener("click", gerarLote);
+$("btnGerar").addEventListener("click", () => gerarLote());
 $("btnCancelar").addEventListener("click", () => {
   if (!estado.processando) return;
   estado.cancelar = true;
@@ -451,9 +461,10 @@ async function iniciar() {
     const titulo = document.createElement("strong");
     titulo.textContent = "O motor WASM não carregou.";
     const motivos = document.createElement("ul");
+    const local = ["127.0.0.1", "localhost", "::1"].includes(location.hostname);
     for (const dica of [
-      "Abra por http://127.0.0.1:8020, não pelo arquivo index.html.",
-      "Confirme que wasm/danfse.wasm existe (scripts/build-wasm.ps1).",
+      "Recarregue a página. Se persistir, tente outro navegador atualizado.",
+      ...(local ? ["Confirme que wasm/danfse.wasm existe (scripts/build-wasm.ps1)."] : []),
       `Detalhe: ${erro?.message || erro}`,
     ]) {
       const li = document.createElement("li");

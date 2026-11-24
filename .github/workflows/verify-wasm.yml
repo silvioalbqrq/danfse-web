@@ -21,6 +21,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Testes do site
+        run: node --test tests/*.test.js
+
       - name: O binário versionado existe?
         run: test -s wasm/danfse.wasm && test -s wasm/wasm_exec.js
 

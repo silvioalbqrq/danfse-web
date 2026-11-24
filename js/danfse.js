@@ -19,23 +19,11 @@ function base64ParaBytes(base64) {
 export async function gerarPdf(xml, opcoes) {
   const api = await carregarMotor();
 
-  if (!api || typeof api.gerarPdf !== "function") {
-    throw new Error("O motor WASM não expôs gerarPdf.");
-  }
-
-  const resposta = api.gerarPdf(JSON.stringify({
+  const pdf = await api.gerarPdf({
     xml,
     stc: Number(opcoes.stc) || 0,
     canhoto: Boolean(opcoes.canhoto),
-  }));
+  });
 
-  const resultado = typeof resposta === "string" ? JSON.parse(resposta) : resposta;
-  if (!resultado || resultado.error) {
-    throw new Error(resultado?.error || "O gerador devolveu uma resposta vazia.");
-  }
-  if (!resultado.pdf) {
-    throw new Error("O gerador não devolveu o conteúdo do PDF.");
-  }
-
-  return new Blob([base64ParaBytes(resultado.pdf)], { type: "application/pdf" });
+  return new Blob([base64ParaBytes(pdf)], { type: "application/pdf" });
 }

@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Gera o DANFSe em PDF a partir do XML da NFS-e, no navegador.",
   "scripts": {
-    "test": "node --test tests/",
+    "test": "node --test tests/*.test.js",
     "start": "python -m http.server 8020 --bind 127.0.0.1"
   }
 }

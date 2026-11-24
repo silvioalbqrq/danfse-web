@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b1f3a">
+<meta name="theme-color" content="#f4f7fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#081426" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Gere o DANFSe em PDF a partir do XML da NFS-e, direto no navegador. Sem servidor, sem certificado e sem enviar dados fiscais para fora.">
 <title>DANFSe Web — XML para PDF no navegador</title>
 <link rel="preload" href="assets/fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -98,7 +99,7 @@
 
       <div class="progresso-box" id="progressoBox" hidden>
         <div class="progresso-topo">
-          <span id="progressoTexto">Preparando…</span>
+          <span id="progressoTexto" aria-live="polite">Preparando…</span>
           <span id="progressoNumero" class="mono"></span>
         </div>
         <progress id="progresso" max="1" value="0"></progress>
