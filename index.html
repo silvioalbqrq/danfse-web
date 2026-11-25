@@ -49,7 +49,7 @@
       <h2 id="tituloArquivos"><span class="n" aria-hidden="true">1</span>Arquivos</h2>
       <p class="sub">Aceita vários XMLs. Cada um vira um PDF; o lote inteiro pode ir num ZIP.</p>
 
-      <div class="drop" id="drop" tabindex="0" role="button" aria-describedby="dropAjuda">
+      <label class="drop" id="drop" for="entradaArquivos">
         <svg class="drop-icone" viewBox="0 0 48 48" aria-hidden="true">
           <path d="M12 6h16l10 10v26H12z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
           <path d="M28 6v10h10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
@@ -57,10 +57,10 @@
         </svg>
         <strong id="dropTitulo">Arraste os XMLs aqui</strong>
         <span class="drop-ou">ou</span>
-        <button class="btn" id="btnEscolher" type="button">Escolher XMLs</button>
-        <input type="file" id="entradaArquivos" accept=".xml,text/xml,application/xml" multiple hidden>
-        <p class="ajuda" id="dropAjuda">Até 5 MiB por arquivo. O XML é lido só na memória desta aba.</p>
-      </div>
+        <span class="btn">Escolher XMLs</span>
+        <input type="file" id="entradaArquivos" accept=".xml,text/xml,application/xml" multiple class="so-leitor">
+        <span class="ajuda" id="dropAjuda">Até 5 MiB por arquivo. O XML é lido só na memória desta aba.</span>
+      </label>
 
       <div class="lista-topo" id="listaTopo" hidden>
         <span id="resumoLista">0 arquivos</span>
