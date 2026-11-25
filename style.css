@@ -230,7 +230,8 @@ code, .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; fo
   cursor: pointer;
   transition: border-color .18s, background .18s, transform .18s;
 }
-.drop:hover, .drop:focus-visible { border-color: var(--accent); background: var(--accent-soft); outline: none; }
+.drop:hover, .drop:has(.so-leitor:focus-visible) { border-color: var(--accent); background: var(--accent-soft); }
+.drop:has(.so-leitor:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
 .drop.arrastando { border-color: var(--emerald); background: var(--green-bg); transform: scale(.995); }
 .drop.indisponivel { opacity: .55; cursor: progress; }
 .drop-icone {
@@ -245,6 +246,19 @@ code, .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; fo
 .drop strong { font-size: .95rem; font-weight: 700; color: var(--navy); }
 .drop-ou { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; }
 .drop .ajuda { margin: 2px 0 0; }
+
+/* Input de arquivo escondido do olhar, mas ainda na arvore de acessibilidade. */
+.so-leitor {
+  position: absolute;
+  clip-path: inset(50%);
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  white-space: nowrap;
+}
 
 /* Botões e campos */
 .btn {

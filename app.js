@@ -23,14 +23,6 @@ const lista = $("lista");
 
 /* ---------- entrada de arquivos ---------- */
 
-function abrirSeletor() {
-  if (estado.motor !== "pronto") {
-    toast("Aguarde o motor carregar antes de escolher arquivos.", "erro");
-    return;
-  }
-  entrada.click();
-}
-
 async function adicionarArquivos(arquivos) {
   let recusados = 0;
   let ignorados = 0;
@@ -386,20 +378,8 @@ function opcoesMudaram() {
 
 /* ---------- eventos ---------- */
 
-drop.addEventListener("click", (evento) => {
-  if (evento.target.closest("button, input")) return;
-  abrirSeletor();
-});
-drop.addEventListener("keydown", (evento) => {
-  if (evento.key === "Enter" || evento.key === " ") {
-    evento.preventDefault();
-    abrirSeletor();
-  }
-});
-$("btnEscolher").addEventListener("click", (evento) => {
-  evento.stopPropagation();
-  abrirSeletor();
-});
+// O <label for> abre o seletor de arquivos sozinho — por clique, teclado e
+// leitor de tela. Sem listener de clique nem de tecla aqui.
 entrada.addEventListener("change", () => {
   adicionarArquivos([...entrada.files]);
   entrada.value = "";
